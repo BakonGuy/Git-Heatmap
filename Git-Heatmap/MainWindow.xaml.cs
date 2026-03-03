@@ -1,23 +1,172 @@
-﻿using System.Text;
+using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using GitHeatmap.Core.Export;
+using GitHeatmap.Core.Services;
+using Microsoft.Win32;
 
 namespace Git_Heatmap;
 
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
 public partial class MainWindow : Window
 {
+	private static readonly SolidColorBrush[] Palette =
+	[
+		new(Color.FromRgb(0x16, 0x1B, 0x22)),
+		new(Color.FromRgb(0x0E, 0x44, 0x29)),
+		new(Color.FromRgb(0x00, 0x6D, 0x32)),
+		new(Color.FromRgb(0x26, 0xA6, 0x41)),
+		new(Color.FromRgb(0x39, 0xD3, 0x53))
+	];
+
+	private readonly HeatmapService _service = new();
+	private string _configPath = string.Empty;
+	private int _lookbackDays = 365;
+	private ConfigWindow? _configWindow;
+
 	public MainWindow()
 	{
 		InitializeComponent();
+		Loaded += async (_, _) => await RefreshAsync();
+	}
+
+	private async Task EnsureConfigPathAsync()
+	{
+		if( !string.IsNullOrWhiteSpace(_configPath) )
+		{
+			return;
+		}
+
+		_configPath = ConfigPathResolver.ResolveFrom(AppContext.BaseDirectory);
+		await ConfigLoader.WriteTemplateIfMissingAsync(_configPath);
+	}
+
+	private async Task RefreshAsync()
+	{
+		try
+		{
+			await EnsureConfigPathAsync();
+			var config = await ConfigLoader.LoadAsync(_configPath);
+			_lookbackDays = config.LookbackDays;
+
+			var result = await _service.BuildAsync(config);
+			RenderHeatmap(result.DailyCounts);
+
+			SummaryText.Text = $"{result.TotalContributions} contributions in the last {_lookbackDays} days";
+			StatusText.Text = result.Warnings.Count > 0
+				? string.Join(Environment.NewLine, result.Warnings)
+				: string.Empty;
+		}
+		catch( Exception ex )
+		{
+			StatusText.Text = ex.Message;
+			SummaryText.Text = "Failed to load heatmap";
+		}
+	}
+
+	private void RenderHeatmap(Dictionary<DateOnly, int> dailyCounts)
+	{
+		HeatmapGrid.Children.Clear();
+
+		var end = DateOnly.FromDateTime(DateTime.Today);
+		var start = end.AddDays(-(_lookbackDays - 1));
+		var startOnSunday = start.AddDays(-(int)start.DayOfWeek);
+		var max = dailyCounts.Values.DefaultIfEmpty(0).Max();
+
+		for( var week = 0; week < 53; week++ )
+		{
+			for( var day = 0; day < 7; day++ )
+			{
+				var current = startOnSunday.AddDays((week * 7) + day);
+				var count = dailyCounts.TryGetValue(current, out var c) && current >= start && current <= end ? c : 0;
+				var level = HtmlHeatmapExporter.ToLevel(count, max);
+
+				HeatmapGrid.Children.Add(new System.Windows.Controls.Border
+				{
+					Width = 12,
+					Height = 12,
+					Margin = new Thickness(1.5),
+					CornerRadius = new CornerRadius(2),
+					Background = Palette[level],
+					ToolTip = $"{current:yyyy-MM-dd}: {count}"
+				});
+			}
+		}
+	}
+
+	private async void RefreshButton_OnClick(object sender, RoutedEventArgs e)
+	{
+		await RefreshAsync();
+	}
+
+	private async void ConfigButton_OnClick(object sender, RoutedEventArgs e)
+	{
+		await EnsureConfigPathAsync();
+
+		if( _configWindow is { IsLoaded: true } )
+		{
+			_configWindow.Activate();
+			return;
+		}
+
+		_configWindow = new ConfigWindow(_configPath, async () => await RefreshAsync())
+		{
+			Owner = this
+		};
+		_configWindow.Closed += (_, _) => _configWindow = null;
+		_configWindow.Show();
+	}
+
+	private async void ExportHtmlButton_OnClick(object sender, RoutedEventArgs e)
+	{
+		await EnsureConfigPathAsync();
+
+		var dialog = new SaveFileDialog
+		{
+			Filter = "HTML file (*.html)|*.html",
+			FileName = "heatmap.html"
+		};
+
+		if( dialog.ShowDialog() != true )
+		{
+			return;
+		}
+
+		var config = await ConfigLoader.LoadAsync(_configPath);
+		var result = await _service.BuildAsync(config);
+		var html = HtmlHeatmapExporter.Export(result, config.LookbackDays);
+		await File.WriteAllTextAsync(dialog.FileName, html);
+		StatusText.Text = $"HTML exported to {dialog.FileName}";
+	}
+
+	private void ExportPngButton_OnClick(object sender, RoutedEventArgs e)
+	{
+		var dialog = new SaveFileDialog
+		{
+			Filter = "PNG image (*.png)|*.png",
+			FileName = "heatmap.png"
+		};
+
+		if( dialog.ShowDialog() != true )
+		{
+			return;
+		}
+
+		HeatmapPanel.Measure(new Size(HeatmapPanel.ActualWidth, HeatmapPanel.ActualHeight));
+		HeatmapPanel.Arrange(new Rect(new Size(HeatmapPanel.ActualWidth, HeatmapPanel.ActualHeight)));
+
+		var width = (int)Math.Ceiling(HeatmapPanel.ActualWidth);
+		var height = (int)Math.Ceiling(HeatmapPanel.ActualHeight);
+
+		var render = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+		render.Render(HeatmapPanel);
+
+		var encoder = new PngBitmapEncoder();
+		encoder.Frames.Add(BitmapFrame.Create(render));
+
+		using var stream = File.Create(dialog.FileName);
+		encoder.Save(stream);
+
+		StatusText.Text = $"PNG exported to {dialog.FileName}";
 	}
 }

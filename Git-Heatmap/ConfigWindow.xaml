@@ -1,0 +1,64 @@
+<Window x:Class="Git_Heatmap.ConfigWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Configuration" Height="640" Width="540" MinHeight="560" MinWidth="500"
+        WindowStartupLocation="CenterOwner">
+    <DockPanel Margin="14">
+        <Grid DockPanel.Dock="Bottom" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="1" Width="90" Content="Save" Click="SaveButton_OnClick" />
+            <Button Grid.Column="3" Width="90" Content="Cancel" Click="CancelButton_OnClick" />
+        </Grid>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Text="Lookback Days" />
+                <TextBox x:Name="LookbackDaysTextBox" Margin="0,4,0,10" TextChanged="GlobalField_OnChanged" />
+
+                <TextBlock Text="Author Match" />
+                <TextBox x:Name="AuthorMatchTextBox" Margin="0,4,0,10" TextChanged="GlobalField_OnChanged" />
+
+                <TextBlock Text="Repositories" />
+                <ListBox x:Name="RepoListBox" Height="180" Margin="0,4,0,8" SelectionChanged="RepoListBox_OnSelectionChanged"
+                         DisplayMemberPath="Name" />
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <Button Content="Add Local" Width="95" Margin="0,0,6,0" Click="AddLocalRepoButton_OnClick" />
+                    <Button Content="Add GitHub" Width="95" Margin="0,0,6,0" Click="AddGitHubRepoButton_OnClick" />
+                    <Button Content="Remove" Width="80" Click="RemoveRepoButton_OnClick" />
+                </StackPanel>
+
+                <TextBlock Text="Selected Repo" FontWeight="SemiBold" Margin="0,0,0,8" />
+
+                <TextBlock Text="Name" />
+                <TextBox x:Name="RepoNameTextBox" Margin="0,4,0,8" TextChanged="RepoFieldDraft_OnChanged" LostFocus="RepoField_OnLostFocus"
+                         KeyDown="RepoField_OnKeyDown" />
+
+                <TextBlock Text="Type" />
+                <ComboBox x:Name="RepoTypeComboBox" Margin="0,4,0,8" SelectionChanged="RepoFieldCommit_OnChanged" />
+
+                <TextBlock x:Name="RepoPathLabel" Text="Local Path" />
+                <TextBox x:Name="RepoPathTextBox" Margin="0,4,0,8" TextChanged="RepoFieldDraft_OnChanged" LostFocus="RepoField_OnLostFocus"
+                         KeyDown="RepoField_OnKeyDown" />
+
+                <TextBlock x:Name="RepoOwnerLabel" Text="GitHub Owner" />
+                <TextBox x:Name="RepoOwnerTextBox" Margin="0,4,0,8" TextChanged="RepoFieldDraft_OnChanged" LostFocus="RepoField_OnLostFocus"
+                         KeyDown="RepoField_OnKeyDown" />
+
+                <TextBlock x:Name="RepoRepoLabel" Text="GitHub Repo" />
+                <TextBox x:Name="RepoRepoTextBox" Margin="0,4,0,0" TextChanged="RepoFieldDraft_OnChanged" LostFocus="RepoField_OnLostFocus"
+                         KeyDown="RepoField_OnKeyDown" />
+
+                <TextBlock x:Name="StatusText" Margin="0,12,0,0" Foreground="#555" TextWrapping="Wrap" />
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>
