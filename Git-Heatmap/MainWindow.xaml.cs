@@ -152,14 +152,15 @@ public partial class MainWindow : Window
 			return;
 		}
 
-		HeatmapPanel.Measure(new Size(HeatmapPanel.ActualWidth, HeatmapPanel.ActualHeight));
-		HeatmapPanel.Arrange(new Rect(new Size(HeatmapPanel.ActualWidth, HeatmapPanel.ActualHeight)));
+        HeatmapPanel.UpdateLayout();
+        HeatmapPanel.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        HeatmapPanel.Arrange(new Rect(HeatmapPanel.DesiredSize));
 
-		var width = (int)Math.Ceiling(HeatmapPanel.ActualWidth);
-		var height = (int)Math.Ceiling(HeatmapPanel.ActualHeight);
+        var width = Math.Max(1, (int)Math.Ceiling(HeatmapPanel.ActualWidth));
+        var height = Math.Max(1, (int)Math.Ceiling(HeatmapPanel.ActualHeight));
 
-		var render = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
-		render.Render(HeatmapPanel);
+        var render = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+        render.Render(HeatmapPanel);
 
 		var encoder = new PngBitmapEncoder();
 		encoder.Frames.Add(BitmapFrame.Create(render));

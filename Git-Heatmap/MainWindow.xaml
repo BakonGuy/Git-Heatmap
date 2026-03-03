@@ -13,10 +13,11 @@
             <Button Content="Export PNG" Width="100" Click="ExportPngButton_OnClick" />
         </StackPanel>
 
-        <Border x:Name="HeatmapPanel" Background="#0D1117" CornerRadius="8" Padding="16" BorderBrush="#30363D" BorderThickness="1">
+        <TextBlock x:Name="StatusText" DockPanel.Dock="Bottom" Margin="0,12,0,0" Foreground="#8B949E" TextWrapping="Wrap" />
+
+        <Border x:Name="HeatmapPanel" Background="#0D1117" CornerRadius="8" Padding="16" BorderBrush="#30363D" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top">
             <DockPanel>
                 <TextBlock x:Name="SummaryText" DockPanel.Dock="Top" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="#E6EDF3" />
-                <TextBlock x:Name="StatusText" DockPanel.Dock="Bottom" Margin="0,12,0,0" Foreground="#8B949E" TextWrapping="Wrap" />
 
                 <StackPanel>
                     <UniformGrid x:Name="HeatmapGrid" Rows="7" Columns="53" HorizontalAlignment="Left" />
