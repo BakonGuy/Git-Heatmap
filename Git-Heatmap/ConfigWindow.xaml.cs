@@ -10,8 +10,8 @@ namespace Git_Heatmap;
 
 public partial class ConfigWindow : Window
 {
-	private static readonly Brush DirtyBrush = new SolidColorBrush(Color.FromRgb(0xFF, 0xFF, 0xCC));
-	private static readonly Brush CleanBrush = Brushes.White;
+    private static readonly Brush DirtyBrush = new SolidColorBrush(Color.FromRgb(0xFF, 0xFF, 0xCC));
+    private static readonly Brush CleanBrush = new SolidColorBrush(Color.FromRgb(0x16, 0x1B, 0x22));
 
 	private readonly string _configPath;
 	private readonly Func<Task> _onSaved;
