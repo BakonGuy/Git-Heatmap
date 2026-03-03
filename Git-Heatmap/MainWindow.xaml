@@ -9,8 +9,8 @@
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,10">
             <Button Content="Refresh" Width="90" Margin="0,0,8,0" Click="RefreshButton_OnClick" />
             <Button Content="Config" Width="90" Margin="0,0,8,0" Click="ConfigButton_OnClick" />
-            <Button Content="Export HTML" Width="100" Margin="0,0,8,0" Click="ExportHtmlButton_OnClick" />
-            <Button Content="Export PNG" Width="100" Click="ExportPngButton_OnClick" />
+            <Button Content="Export HTML" Width="120" Margin="0,0,8,0" Click="ExportHtmlButton_OnClick" />
+            <Button Content="Export PNG" Width="120" Click="ExportPngButton_OnClick" />
         </StackPanel>
 
         <TextBlock x:Name="StatusText" DockPanel.Dock="Bottom" Margin="0,12,0,0" Foreground="#8B949E" TextWrapping="Wrap" />

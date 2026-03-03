@@ -29,7 +29,7 @@ public static class HtmlHeatmapExporter
                 var count = result.DailyCounts.TryGetValue(current, out var c) && current >= start && current <= end ? c : 0;
                 var level = ToLevel(count, max);
                 var color = Palette[level];
-                sb.AppendLine($"<div class='cell' title='{current:yyyy-MM-dd}: {count}' style='background:{color}'></div>");
+                sb.AppendLine($"<div class='cell' title='{current:MMMM d, yyyy} - {count} commit{(count == 1 ? string.Empty : "s")}' style='background:{color}'></div>");
             }
         }
 

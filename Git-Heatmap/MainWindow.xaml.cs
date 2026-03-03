@@ -1,5 +1,6 @@
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using GitHeatmap.Core.Export;
@@ -83,16 +84,22 @@ public partial class MainWindow : Window
 				var current = startOnSunday.AddDays((week * 7) + day);
 				var count = dailyCounts.TryGetValue(current, out var c) && current >= start && current <= end ? c : 0;
 				var level = HtmlHeatmapExporter.ToLevel(count, max);
-
-				HeatmapGrid.Children.Add(new System.Windows.Controls.Border
+				var tooltipText = $"{current:MMMM d, yyyy} - {count} commit{(count == 1 ? string.Empty : "s")}";
+				var cell = new Border
 				{
 					Width = 12,
 					Height = 12,
 					Margin = new Thickness(1.5),
 					CornerRadius = new CornerRadius(2),
 					Background = Palette[level],
-					ToolTip = $"{current:yyyy-MM-dd}: {count}"
-				});
+					IsHitTestVisible = true
+				};
+				var toolTip = new ToolTip { Content = tooltipText };
+				ToolTipService.SetInitialShowDelay(cell, 0);
+				ToolTipService.SetShowDuration(cell, 60000);
+				ToolTipService.SetToolTip(cell, toolTip);
+
+				HeatmapGrid.Children.Add(cell);
 			}
 		}
 	}
