@@ -5,6 +5,13 @@ namespace GitHeatmap.Core.Services;
 public sealed class HeatmapService
 {
     private readonly LocalGitContributionCollector _localCollector = new();
+    private readonly GitHubContributionCollector _githubCollector = new();
+    private readonly Action<string>? _infoLogger;
+
+    public HeatmapService(Action<string>? infoLogger = null)
+    {
+        _infoLogger = infoLogger;
+    }
 
     public async Task<HeatmapResult> BuildAsync(HeatmapConfig config, CancellationToken cancellationToken = default)
     {
@@ -29,8 +36,15 @@ public sealed class HeatmapService
                         break;
                     }
                     case RepoType.GitHub:
-                        warnings.Add($"Skipping '{repo.Name}': remote GitHub collection is not implemented yet.");
+                    {
+                        var dates = await _githubCollector.CollectAsync(repo, since, config.AuthorMatch, _infoLogger, cancellationToken);
+                        foreach (var day in dates)
+                        {
+                            counts[day] = counts.TryGetValue(day, out var current) ? current + 1 : 1;
+                        }
+
                         break;
+                    }
                     default:
                         warnings.Add($"Skipping '{repo.Name}': unsupported repository type '{repo.Type}'.");
                         break;

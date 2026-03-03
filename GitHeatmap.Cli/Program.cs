@@ -9,7 +9,7 @@ var argsList = args.ToList();
 var command = argsList.FirstOrDefault()?.ToLowerInvariant() ?? "refresh";
 
 var config = await ConfigLoader.LoadAsync(configPath);
-var service = new HeatmapService();
+var service = new HeatmapService(message => Console.WriteLine($"Info: {message}"));
 var result = await service.BuildAsync(config);
 
 switch( command )

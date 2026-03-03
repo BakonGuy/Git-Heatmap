@@ -5,12 +5,13 @@ using System.Windows.Input;
 using System.Windows.Media;
 using GitHeatmap.Core.Models;
 using GitHeatmap.Core.Services;
+using Git_Heatmap.Services;
 
 namespace Git_Heatmap;
 
 public partial class ConfigWindow : Window
 {
-    private static readonly Brush DirtyBrush = new SolidColorBrush(Color.FromRgb(0xFF, 0xFF, 0xCC));
+    private static readonly Brush DirtyBrush = new SolidColorBrush(Color.FromRgb(0x3A, 0x33, 0x14));
     private static readonly Brush CleanBrush = new SolidColorBrush(Color.FromRgb(0x16, 0x1B, 0x22));
 
 	private readonly string _configPath;
@@ -20,17 +21,19 @@ public partial class ConfigWindow : Window
 	private HeatmapConfig _savedConfig = new();
 	private bool _isLoading;
 
-	public ConfigWindow(string configPath, Func<Task> onSaved)
-	{
-		InitializeComponent();
-		_configPath = configPath;
-		_onSaved = onSaved;
+    public ConfigWindow(string configPath, Func<Task> onSaved)
+    {
+        InitializeComponent();
+        WindowSizeStore.Apply(this, nameof(ConfigWindow));
+        _configPath = configPath;
+        _onSaved = onSaved;
 
-		RepoTypeComboBox.ItemsSource = Enum.GetValues<RepoType>();
-		RepoListBox.ItemsSource = _repositories;
+        RepoTypeComboBox.ItemsSource = Enum.GetValues<RepoType>();
+        RepoListBox.ItemsSource = _repositories;
 
-		Loaded += async (_, _) => await LoadConfigAsync();
-	}
+        Loaded += async (_, _) => await LoadConfigAsync();
+        Closing += (_, _) => WindowSizeStore.Save(this, nameof(ConfigWindow));
+    }
 
 	private async Task LoadConfigAsync()
 	{
@@ -138,21 +141,13 @@ public partial class ConfigWindow : Window
 		UpdateDirtyIndicators();
 	}
 
-	private void AddLocalRepoButton_OnClick(object sender, RoutedEventArgs e)
-	{
-		var repo = new RepoConfig { Name = "New Local Repo", Type = RepoType.Local };
-		_repositories.Add(repo);
-		RepoListBox.SelectedItem = repo;
-		UpdateDirtyIndicators();
-	}
-
-	private void AddGitHubRepoButton_OnClick(object sender, RoutedEventArgs e)
-	{
-		var repo = new RepoConfig { Name = "New GitHub Repo", Type = RepoType.GitHub };
-		_repositories.Add(repo);
-		RepoListBox.SelectedItem = repo;
-		UpdateDirtyIndicators();
-	}
+    private void AddRepoButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        var repo = new RepoConfig { Name = "New Local Repo", Type = RepoType.Local };
+        _repositories.Add(repo);
+        RepoListBox.SelectedItem = repo;
+        UpdateDirtyIndicators();
+    }
 
 	private void RemoveRepoButton_OnClick(object sender, RoutedEventArgs e)
 	{

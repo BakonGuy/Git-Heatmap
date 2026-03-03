@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using GitHeatmap.Core.Export;
 using GitHeatmap.Core.Services;
+using Git_Heatmap.Services;
 using Microsoft.Win32;
 
 namespace Git_Heatmap;
@@ -27,7 +28,9 @@ public partial class MainWindow : Window
 	public MainWindow()
 	{
 		InitializeComponent();
+		WindowSizeStore.Apply(this, nameof(MainWindow));
 		Loaded += async (_, _) => await RefreshAsync();
+		Closing += (_, _) => WindowSizeStore.Save(this, nameof(MainWindow));
 	}
 
 	private async Task EnsureConfigPathAsync()

@@ -20,6 +20,7 @@ public static class ConfigLoader
 
     public static async Task SaveAsync(string path, HeatmapConfig config, CancellationToken cancellationToken = default)
     {
+        EnsureDirectory(path);
         var json = JsonSerializer.Serialize(config, JsonOptions);
         await File.WriteAllTextAsync(path, json, cancellationToken);
     }
@@ -30,6 +31,8 @@ public static class ConfigLoader
         {
             return;
         }
+
+        EnsureDirectory(path);
 
         var template = new HeatmapConfig
         {
@@ -44,5 +47,14 @@ public static class ConfigLoader
 
         var json = JsonSerializer.Serialize(template, JsonOptions);
         await File.WriteAllTextAsync(path, json, cancellationToken);
+    }
+
+    private static void EnsureDirectory(string path)
+    {
+        var directory = Path.GetDirectoryName(path);
+        if (!string.IsNullOrWhiteSpace(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
     }
 }
