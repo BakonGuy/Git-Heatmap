@@ -8,6 +8,10 @@ public static class WindowSizeStore
 {
     private const double MinWidth = 320;
     private const double MinHeight = 240;
+    private const double MinLeft = -10000;
+    private const double MaxLeft = 10000;
+    private const double MinTop = -10000;
+    private const double MaxTop = 10000;
 
     private static readonly string StorePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -31,18 +35,38 @@ public static class WindowSizeStore
         {
             window.Height = size.Height;
         }
+
+        if (size.Left >= MinLeft && size.Left <= MaxLeft)
+        {
+            window.Left = size.Left;
+        }
+
+        if (size.Top >= MinTop && size.Top <= MaxTop)
+        {
+            window.Top = size.Top;
+        }
+    }
+
+    public static bool HasSavedState(string key)
+    {
+        var map = Load();
+        return map.ContainsKey(key);
     }
 
     public static void Save(Window window, string key)
     {
-        var source = window.WindowState == WindowState.Normal ? new Size(window.Width, window.Height) : window.RestoreBounds.Size;
+        var bounds = window.WindowState == WindowState.Normal
+            ? new Rect(window.Left, window.Top, window.Width, window.Height)
+            : window.RestoreBounds;
+
+        var source = bounds.Size;
         if (source.Width < MinWidth || source.Height < MinHeight)
         {
             return;
         }
 
         var map = Load();
-        map[key] = new SavedWindowSize(source.Width, source.Height);
+        map[key] = new SavedWindowSize(source.Width, source.Height, bounds.Left, bounds.Top);
 
         Directory.CreateDirectory(Path.GetDirectoryName(StorePath)!);
         var json = JsonSerializer.Serialize(map, new JsonSerializerOptions { WriteIndented = true });
@@ -68,5 +92,5 @@ public static class WindowSizeStore
         }
     }
 
-    private sealed record SavedWindowSize(double Width, double Height);
+    private sealed record SavedWindowSize(double Width, double Height, double Left, double Top);
 }

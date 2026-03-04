@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using GitHeatmap.Core.Export;
+using GitHeatmap.Core.Models;
 using GitHeatmap.Core.Services;
 using Git_Heatmap.Services;
 using Microsoft.Win32;
@@ -25,13 +26,16 @@ public partial class MainWindow : Window
 	private string _configPath = string.Empty;
 	private int _lookbackDays = 365;
 	private ConfigWindow? _configWindow;
+    private readonly bool _hasSavedWindowState;
 
 	public MainWindow()
 	{
 		InitializeComponent();
+        _hasSavedWindowState = WindowSizeStore.HasSavedState(nameof(MainWindow));
 		WindowSizeStore.Apply(this, nameof(MainWindow));
 		Loaded += async (_, _) => await RefreshAsync();
 		Closing += (_, _) => WindowSizeStore.Save(this, nameof(MainWindow));
+        SizeChanged += (_, _) => UpdateMinimumWindowSize();
 	}
 
 	private async Task EnsureConfigPathAsync()
@@ -49,14 +53,30 @@ public partial class MainWindow : Window
 	{
 		try
 		{
+            RenderHeatmap(CreateEmptyResult());
+            SummaryText.Text = $"0 commits in the last {_lookbackDays} days";
+            StatusText.Text = "Loading commit data...";
+            UpdateMinimumWindowSize();
+            if( !_hasSavedWindowState )
+            {
+                Width = MinWidth;
+                Height = MinHeight;
+            }
+
 			await EnsureConfigPathAsync();
 			var config = await ConfigLoader.LoadAsync(_configPath);
 			_lookbackDays = config.LookbackDays;
 
 			var result = await _service.BuildAsync(config);
-			RenderHeatmap(result.DailyCounts);
+			RenderHeatmap(result);
+            UpdateMinimumWindowSize();
+            if( !_hasSavedWindowState )
+            {
+                Width = MinWidth;
+                Height = MinHeight;
+            }
 
-			SummaryText.Text = $"{result.TotalContributions} contributions in the last {_lookbackDays} days";
+			SummaryText.Text = $"{result.TotalContributions} commits in the last {_lookbackDays} days";
 			StatusText.Text = result.Warnings.Count > 0
 				? string.Join(Environment.NewLine, result.Warnings)
 				: string.Empty;
@@ -68,7 +88,38 @@ public partial class MainWindow : Window
 		}
 	}
 
-	private void RenderHeatmap(Dictionary<DateOnly, int> dailyCounts)
+    private static HeatmapResult CreateEmptyResult()
+    {
+        return new HeatmapResult
+        {
+            DailyCounts = new Dictionary<DateOnly, int>(),
+            DailyRepoNames = new Dictionary<DateOnly, HashSet<string>>(),
+            Warnings = []
+        };
+    }
+
+    private void UpdateMinimumWindowSize()
+    {
+        RootDock.UpdateLayout();
+        HeatmapPanel.UpdateLayout();
+        StatusText.UpdateLayout();
+        ActionBar.UpdateLayout();
+
+        const double rootMargin = 28; // Root DockPanel has Margin=14
+        var chromeWidth = Math.Max(0, ActualWidth - RootDock.ActualWidth);
+        var chromeHeight = Math.Max(0, ActualHeight - RootDock.ActualHeight);
+
+        var actionBarHeight = ActionBar.ActualHeight + ActionBar.Margin.Top + ActionBar.Margin.Bottom;
+        var statusHeight = StatusText.ActualHeight + StatusText.Margin.Top + StatusText.Margin.Bottom;
+
+        var minContentWidth = HeatmapPanel.ActualWidth + rootMargin;
+        var minContentHeight = HeatmapPanel.ActualHeight + actionBarHeight + statusHeight + rootMargin;
+
+        MinWidth = Math.Ceiling(minContentWidth + chromeWidth);
+        MinHeight = Math.Ceiling(minContentHeight + chromeHeight);
+    }
+
+	private void RenderHeatmap(HeatmapResult result)
 	{
 		HeatmapGrid.Children.Clear();
         HeatmapGrid.RowDefinitions.Clear();
@@ -87,7 +138,7 @@ public partial class MainWindow : Window
 		var end = DateOnly.FromDateTime(DateTime.Today);
 		var start = end.AddDays(-(_lookbackDays - 1));
 		var startOnSunday = start.AddDays(-(int)start.DayOfWeek);
-		var max = dailyCounts.Values.DefaultIfEmpty(0).Max();
+		var max = result.DailyCounts.Values.DefaultIfEmpty(0).Max();
 
 		for( var week = 0; week < 53; week++ )
 		{
@@ -99,9 +150,13 @@ public partial class MainWindow : Window
                     continue;
                 }
 
-				var count = dailyCounts.TryGetValue(current, out var c) && current >= start && current <= end ? c : 0;
+				var count = result.DailyCounts.TryGetValue(current, out var c) && current >= start && current <= end ? c : 0;
 				var level = HtmlHeatmapExporter.ToLevel(count, max);
-				var tooltipText = $"{current:MMMM d, yyyy} - {count} commit{(count == 1 ? string.Empty : "s")}";
+                var repoLines = result.DailyRepoNames.TryGetValue(current, out var repos)
+                    ? string.Join(Environment.NewLine, repos.OrderBy(x => x, StringComparer.OrdinalIgnoreCase).Select(x => $"- {x}"))
+                    : "- None";
+                var commitLabel = count == 1 ? "Commit" : "Commits";
+				var tooltipText = $"{current:MMMM d, yyyy} - {count} {commitLabel}{Environment.NewLine}{repoLines}";
 				var cell = new Border
 				{
 					Width = 12,

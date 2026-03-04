@@ -4,16 +4,22 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Git Heatmap" Height="620" Width="980" MinHeight="500" MinWidth="820">
-    <DockPanel Margin="14">
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,10">
-            <Button Content="Refresh" Width="90" Margin="0,0,8,0" Click="RefreshButton_OnClick" />
-            <Button Content="Config" Width="90" Margin="0,0,8,0" Click="ConfigButton_OnClick" />
-            <Button Content="Export HTML" Width="120" Margin="0,0,8,0" Click="ExportHtmlButton_OnClick" />
-            <Button Content="Export PNG" Width="120" Click="ExportPngButton_OnClick" />
-        </StackPanel>
+        Title="Git Heatmap" Height="620" Width="980">
+    <DockPanel x:Name="RootDock" Margin="14">
+        <Grid x:Name="ActionBar" DockPanel.Dock="Bottom" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="Config" Width="90" HorizontalAlignment="Left" Click="ConfigButton_OnClick" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Refresh" Width="90" Margin="0,0,8,0" Click="RefreshButton_OnClick" />
+                <Button Content="Export HTML" Width="120" Margin="0,0,8,0" Click="ExportHtmlButton_OnClick" />
+                <Button Content="Export PNG" Width="120" Click="ExportPngButton_OnClick" />
+            </StackPanel>
+        </Grid>
 
-        <TextBlock x:Name="StatusText" DockPanel.Dock="Bottom" Margin="0,12,0,0" Foreground="#9A9A9A" TextWrapping="Wrap" />
+        <TextBlock x:Name="StatusText" DockPanel.Dock="Bottom" Margin="0,0,0,0" Foreground="#9A9A9A" TextWrapping="Wrap" />
 
         <Border x:Name="HeatmapPanel" Background="#111111" CornerRadius="8" Padding="16" BorderBrush="#2F2F2F" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top">
             <DockPanel>

@@ -17,7 +17,7 @@ public static class HtmlHeatmapExporter
         var sb = new StringBuilder();
         sb.AppendLine("<!doctype html><html><head><meta charset=\"utf-8\"><title>Git Heatmap</title>");
         sb.AppendLine("<style>body{font-family:Segoe UI,Arial,sans-serif;background:#111111;color:#e6e6e6;padding:24px}.grid{display:grid;grid-template-columns:repeat(53,12px);grid-template-rows:repeat(7,12px);grid-auto-flow:column;gap:3px}.cell{width:12px;height:12px;border-radius:2px}.meta{margin-bottom:10px}</style></head><body>");
-        sb.AppendLine($"<div class='meta'><strong>{result.TotalContributions}</strong> contributions in the last {lookbackDays} days</div>");
+        sb.AppendLine($"<div class='meta'><strong>{result.TotalContributions}</strong> commits in the last {lookbackDays} days</div>");
         sb.AppendLine("<div class='grid'>");
 
         var startOnSunday = start.AddDays(-(int)start.DayOfWeek);
@@ -35,7 +35,12 @@ public static class HtmlHeatmapExporter
                 var count = result.DailyCounts.TryGetValue(current, out var c) && current >= start && current <= end ? c : 0;
                 var level = ToLevel(count, max);
                 var color = Palette[level];
-                sb.AppendLine($"<div class='cell' title='{current:MMMM d, yyyy} - {count} commit{(count == 1 ? string.Empty : "s")}' style='background:{color}'></div>");
+                var repoLines = result.DailyRepoNames.TryGetValue(current, out var repos)
+                    ? string.Join("&#10;", repos.OrderBy(x => x, StringComparer.OrdinalIgnoreCase).Select(x => $"- {x}"))
+                    : "- None";
+                var commitLabel = count == 1 ? "Commit" : "Commits";
+                var tooltip = $"{current:MMMM d, yyyy} - {count} {commitLabel}&#10;{repoLines}";
+                sb.AppendLine($"<div class='cell' title='{tooltip}' style='background:{color}'></div>");
             }
         }
 

@@ -15,7 +15,7 @@ var result = await service.BuildAsync(config);
 switch( command )
 {
 	case "refresh":
-		Console.WriteLine($"Total contributions: {result.TotalContributions}");
+		Console.WriteLine($"Total commits: {result.TotalContributions}");
 		Console.WriteLine($"Active days: {result.DailyCounts.Count(kvp => kvp.Value > 0)}");
 		break;
 

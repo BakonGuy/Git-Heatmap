@@ -17,6 +17,7 @@ public sealed class HeatmapService
     {
         var since = DateOnly.FromDateTime(DateTime.Today.AddDays(-(config.LookbackDays - 1)));
         var counts = new Dictionary<DateOnly, int>();
+        var repoNamesByDay = new Dictionary<DateOnly, HashSet<string>>();
         var warnings = new List<string>();
 
         foreach (var repo in config.Repositories)
@@ -31,6 +32,7 @@ public sealed class HeatmapService
                         foreach (var day in dates)
                         {
                             counts[day] = counts.TryGetValue(day, out var current) ? current + 1 : 1;
+                            AddRepoForDay(repoNamesByDay, day, repo.Name);
                         }
 
                         break;
@@ -41,6 +43,7 @@ public sealed class HeatmapService
                         foreach (var day in dates)
                         {
                             counts[day] = counts.TryGetValue(day, out var current) ? current + 1 : 1;
+                            AddRepoForDay(repoNamesByDay, day, repo.Name);
                         }
 
                         break;
@@ -59,7 +62,19 @@ public sealed class HeatmapService
         return new HeatmapResult
         {
             DailyCounts = counts,
+            DailyRepoNames = repoNamesByDay,
             Warnings = warnings
         };
+    }
+
+    private static void AddRepoForDay(Dictionary<DateOnly, HashSet<string>> repoNamesByDay, DateOnly day, string repoName)
+    {
+        if (!repoNamesByDay.TryGetValue(day, out var names))
+        {
+            names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            repoNamesByDay[day] = names;
+        }
+
+        names.Add(string.IsNullOrWhiteSpace(repoName) ? "Unnamed Repo" : repoName.Trim());
     }
 }
