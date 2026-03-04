@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GitHeatmap.Core\GitHeatmap.Core.csproj" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -9,6 +10,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UseSystemDrawing>true</UseSystemDrawing>
   </PropertyGroup>
 
 </Project>

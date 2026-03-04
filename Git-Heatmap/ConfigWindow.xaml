@@ -48,8 +48,16 @@
                 <ComboBox x:Name="RepoTypeComboBox" Margin="0,4,0,8" SelectionChanged="RepoFieldCommit_OnChanged" />
 
                 <TextBlock x:Name="RepoPathLabel" Text="Local Path" />
-                <TextBox x:Name="RepoPathTextBox" Margin="0,4,0,8" TextChanged="RepoFieldDraft_OnChanged" LostFocus="RepoField_OnLostFocus"
-                         KeyDown="RepoField_OnKeyDown" />
+                <Grid x:Name="RepoPathRow" Margin="0,4,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="RepoPathTextBox" Grid.Column="0" TextChanged="RepoFieldDraft_OnChanged" LostFocus="RepoField_OnLostFocus"
+                             KeyDown="RepoField_OnKeyDown" />
+                    <Button x:Name="RepoPathBrowseButton" Grid.Column="2" Width="80" Content="Browse..." Click="RepoPathBrowseButton_OnClick" />
+                </Grid>
 
                 <TextBlock x:Name="RepoOwnerLabel" Text="GitHub Owner" />
                 <TextBox x:Name="RepoOwnerTextBox" Margin="0,4,0,8" TextChanged="RepoFieldDraft_OnChanged" LostFocus="RepoField_OnLostFocus"

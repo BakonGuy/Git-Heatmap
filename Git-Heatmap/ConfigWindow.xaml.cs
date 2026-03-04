@@ -7,6 +7,7 @@ using System.Windows.Media;
 using GitHeatmap.Core.Models;
 using GitHeatmap.Core.Services;
 using Git_Heatmap.Services;
+using Microsoft.Win32;
 
 namespace Git_Heatmap;
 
@@ -121,7 +122,7 @@ public partial class ConfigWindow : Window
 		UpdateDirtyIndicators();
 	}
 
-	private void RepoField_OnKeyDown(object sender, KeyEventArgs e)
+    private void RepoField_OnKeyDown(object sender, KeyEventArgs e)
 	{
 		if( _isLoading || e.Key != Key.Enter )
 		{
@@ -148,6 +149,23 @@ public partial class ConfigWindow : Window
         var repo = new RepoConfig { Name = "New Local Repo", Type = RepoType.Local };
         _repositories.Add(repo);
         RepoListBox.SelectedItem = repo;
+        UpdateDirtyIndicators();
+    }
+
+    private void RepoPathBrowseButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFolderDialog
+        {
+            Title = "Pick local repository directory"
+        };
+
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        RepoPathTextBox.Text = dialog.FolderName;
+        ApplySelectedRepoFieldChanges();
         UpdateDirtyIndicators();
     }
 
@@ -359,7 +377,7 @@ public partial class ConfigWindow : Window
 		var githubVisibility = selectedType == RepoType.GitHub ? Visibility.Visible : Visibility.Collapsed;
 
 		RepoPathLabel.Visibility = localVisibility;
-		RepoPathTextBox.Visibility = localVisibility;
+		RepoPathRow.Visibility = localVisibility;
 
 		RepoOwnerLabel.Visibility = githubVisibility;
 		RepoOwnerTextBox.Visibility = githubVisibility;
