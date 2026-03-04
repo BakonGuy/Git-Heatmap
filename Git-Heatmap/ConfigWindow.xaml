@@ -32,6 +32,7 @@
 
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                     <Button Content="Add Repo" Width="95" Margin="0,0,6,0" Click="AddRepoButton_OnClick" />
+                    <Button Content="Scan for Repos" Width="120" Margin="0,0,6,0" Click="ScanForReposButton_OnClick" />
                     <Button Content="Remove" Width="80" Click="RemoveRepoButton_OnClick" />
                 </StackPanel>
 

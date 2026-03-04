@@ -5,7 +5,7 @@ namespace GitHeatmap.Core.Export;
 
 public static class HtmlHeatmapExporter
 {
-    private static readonly string[] Palette = ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"];
+    private static readonly string[] Palette = ["#1a1a1a", "#4a2a0a", "#7a3e0b", "#b45309", "#f97316"];
 
     public static string Export(HeatmapResult result, int lookbackDays, DateOnly? endDate = null)
     {
@@ -16,7 +16,7 @@ public static class HtmlHeatmapExporter
 
         var sb = new StringBuilder();
         sb.AppendLine("<!doctype html><html><head><meta charset=\"utf-8\"><title>Git Heatmap</title>");
-        sb.AppendLine("<style>body{font-family:Segoe UI,Arial,sans-serif;background:#0d1117;color:#c9d1d9;padding:24px}.grid{display:grid;grid-template-columns:repeat(53,12px);grid-template-rows:repeat(7,12px);gap:3px}.cell{width:12px;height:12px;border-radius:2px}.meta{margin-bottom:10px}</style></head><body>");
+        sb.AppendLine("<style>body{font-family:Segoe UI,Arial,sans-serif;background:#111111;color:#e6e6e6;padding:24px}.grid{display:grid;grid-template-columns:repeat(53,12px);grid-template-rows:repeat(7,12px);grid-auto-flow:column;gap:3px}.cell{width:12px;height:12px;border-radius:2px}.meta{margin-bottom:10px}</style></head><body>");
         sb.AppendLine($"<div class='meta'><strong>{result.TotalContributions}</strong> contributions in the last {lookbackDays} days</div>");
         sb.AppendLine("<div class='grid'>");
 
@@ -26,6 +26,12 @@ public static class HtmlHeatmapExporter
             for (var day = 0; day < 7; day++)
             {
                 var current = startOnSunday.AddDays((week * 7) + day);
+                if (current > end)
+                {
+                    sb.AppendLine("<div class='cell' style='visibility:hidden'></div>");
+                    continue;
+                }
+
                 var count = result.DailyCounts.TryGetValue(current, out var c) && current >= start && current <= end ? c : 0;
                 var level = ToLevel(count, max);
                 var color = Palette[level];

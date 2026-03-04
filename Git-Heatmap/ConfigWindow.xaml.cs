@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,6 +18,7 @@ public partial class ConfigWindow : Window
 	private readonly string _configPath;
 	private readonly Func<Task> _onSaved;
 	private readonly ObservableCollection<RepoConfig> _repositories = [];
+    private ScanReposWindow? _scanReposWindow;
 
 	private HeatmapConfig _savedConfig = new();
 	private bool _isLoading;
@@ -149,6 +151,22 @@ public partial class ConfigWindow : Window
         UpdateDirtyIndicators();
     }
 
+    private void ScanForReposButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_scanReposWindow is { IsLoaded: true })
+        {
+            _scanReposWindow.Activate();
+            return;
+        }
+
+        _scanReposWindow = new ScanReposWindow(AddScannedRepos)
+        {
+            Owner = this
+        };
+        _scanReposWindow.Closed += (_, _) => _scanReposWindow = null;
+        _scanReposWindow.Show();
+    }
+
 	private void RemoveRepoButton_OnClick(object sender, RoutedEventArgs e)
 	{
 		if( RepoListBox.SelectedItem is not RepoConfig selected )
@@ -241,6 +259,43 @@ public partial class ConfigWindow : Window
 	{
 		return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 	}
+
+    private void AddScannedRepos(IReadOnlyList<string> selectedPaths)
+    {
+        var existingLocalPaths = _repositories
+            .Where(repo => repo.Type == RepoType.Local && !string.IsNullOrWhiteSpace(repo.Path))
+            .Select(repo => repo.Path!)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var addedAny = false;
+        foreach (var selectedPath in selectedPaths)
+        {
+            var path = selectedPath.Trim();
+            if (string.IsNullOrWhiteSpace(path) || existingLocalPaths.Contains(path))
+            {
+                continue;
+            }
+
+            var repoName = new DirectoryInfo(path).Name;
+            var repo = new RepoConfig
+            {
+                Name = string.IsNullOrWhiteSpace(repoName) ? "Local Repo" : repoName,
+                Type = RepoType.Local,
+                Path = path
+            };
+
+            _repositories.Add(repo);
+            existingLocalPaths.Add(path);
+            addedAny = true;
+        }
+
+        if (addedAny)
+        {
+            RepoListBox.SelectedIndex = _repositories.Count - 1;
+            StatusText.Text = "Selected repositories added to config (unsaved).";
+            UpdateDirtyIndicators();
+        }
+    }
 
 	private bool TryBuildCurrentConfig(out HeatmapConfig config, out string? error)
 	{

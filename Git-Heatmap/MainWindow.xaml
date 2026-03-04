@@ -13,22 +13,22 @@
             <Button Content="Export PNG" Width="120" Click="ExportPngButton_OnClick" />
         </StackPanel>
 
-        <TextBlock x:Name="StatusText" DockPanel.Dock="Bottom" Margin="0,12,0,0" Foreground="#8B949E" TextWrapping="Wrap" />
+        <TextBlock x:Name="StatusText" DockPanel.Dock="Bottom" Margin="0,12,0,0" Foreground="#9A9A9A" TextWrapping="Wrap" />
 
-        <Border x:Name="HeatmapPanel" Background="#0D1117" CornerRadius="8" Padding="16" BorderBrush="#30363D" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Border x:Name="HeatmapPanel" Background="#111111" CornerRadius="8" Padding="16" BorderBrush="#2F2F2F" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top">
             <DockPanel>
-                <TextBlock x:Name="SummaryText" DockPanel.Dock="Top" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="#E6EDF3" />
+                <TextBlock x:Name="SummaryText" DockPanel.Dock="Top" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="#E6E6E6" />
 
                 <StackPanel>
-                    <UniformGrid x:Name="HeatmapGrid" Rows="7" Columns="53" HorizontalAlignment="Left" />
+                    <Grid x:Name="HeatmapGrid" HorizontalAlignment="Left" />
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-                        <TextBlock Foreground="#8B949E" Margin="0,0,8,0" Text="Less" />
+                        <TextBlock Foreground="#9A9A9A" Margin="0,0,8,0" Text="Less" />
                         <Border Width="12" Height="12" Margin="0,0,4,0" Background="#161B22" CornerRadius="2" />
-                        <Border Width="12" Height="12" Margin="0,0,4,0" Background="#0E4429" CornerRadius="2" />
-                        <Border Width="12" Height="12" Margin="0,0,4,0" Background="#006D32" CornerRadius="2" />
-                        <Border Width="12" Height="12" Margin="0,0,4,0" Background="#26A641" CornerRadius="2" />
-                        <Border Width="12" Height="12" Margin="0,0,8,0" Background="#39D353" CornerRadius="2" />
-                        <TextBlock Foreground="#8B949E" Text="More" />
+                        <Border Width="12" Height="12" Margin="0,0,4,0" Background="#4A2A0A" CornerRadius="2" />
+                        <Border Width="12" Height="12" Margin="0,0,4,0" Background="#7A3E0B" CornerRadius="2" />
+                        <Border Width="12" Height="12" Margin="0,0,4,0" Background="#B45309" CornerRadius="2" />
+                        <Border Width="12" Height="12" Margin="0,0,8,0" Background="#F97316" CornerRadius="2" />
+                        <TextBlock Foreground="#9A9A9A" Text="More" />
                     </StackPanel>
                 </StackPanel>
             </DockPanel>

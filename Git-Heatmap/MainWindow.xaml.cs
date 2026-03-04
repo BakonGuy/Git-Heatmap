@@ -14,11 +14,11 @@ public partial class MainWindow : Window
 {
 	private static readonly SolidColorBrush[] Palette =
 	[
-		new(Color.FromRgb(0x16, 0x1B, 0x22)),
-		new(Color.FromRgb(0x0E, 0x44, 0x29)),
-		new(Color.FromRgb(0x00, 0x6D, 0x32)),
-		new(Color.FromRgb(0x26, 0xA6, 0x41)),
-		new(Color.FromRgb(0x39, 0xD3, 0x53))
+		new(Color.FromRgb(0x1A, 0x1A, 0x1A)),
+		new(Color.FromRgb(0x4A, 0x2A, 0x0A)),
+		new(Color.FromRgb(0x7A, 0x3E, 0x0B)),
+		new(Color.FromRgb(0xB4, 0x53, 0x09)),
+		new(Color.FromRgb(0xF9, 0x73, 0x16))
 	];
 
 	private readonly HeatmapService _service = new();
@@ -71,6 +71,18 @@ public partial class MainWindow : Window
 	private void RenderHeatmap(Dictionary<DateOnly, int> dailyCounts)
 	{
 		HeatmapGrid.Children.Clear();
+        HeatmapGrid.RowDefinitions.Clear();
+        HeatmapGrid.ColumnDefinitions.Clear();
+
+        for( var day = 0; day < 7; day++ )
+        {
+            HeatmapGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        }
+
+        for( var week = 0; week < 53; week++ )
+        {
+            HeatmapGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        }
 
 		var end = DateOnly.FromDateTime(DateTime.Today);
 		var start = end.AddDays(-(_lookbackDays - 1));
@@ -82,6 +94,11 @@ public partial class MainWindow : Window
 			for( var day = 0; day < 7; day++ )
 			{
 				var current = startOnSunday.AddDays((week * 7) + day);
+                if( current > end )
+                {
+                    continue;
+                }
+
 				var count = dailyCounts.TryGetValue(current, out var c) && current >= start && current <= end ? c : 0;
 				var level = HtmlHeatmapExporter.ToLevel(count, max);
 				var tooltipText = $"{current:MMMM d, yyyy} - {count} commit{(count == 1 ? string.Empty : "s")}";
@@ -98,6 +115,8 @@ public partial class MainWindow : Window
 				ToolTipService.SetInitialShowDelay(cell, 0);
 				ToolTipService.SetShowDuration(cell, 60000);
 				ToolTipService.SetToolTip(cell, toolTip);
+                Grid.SetColumn(cell, week);
+                Grid.SetRow(cell, day);
 
 				HeatmapGrid.Children.Add(cell);
 			}
