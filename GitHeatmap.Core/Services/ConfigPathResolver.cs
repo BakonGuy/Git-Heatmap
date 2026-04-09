@@ -4,6 +4,8 @@ public static class ConfigPathResolver
 {
     public const string ConfigFileName = "heatmap.config.json";
     private const string AppFolderName = "GitHeatmap";
+    public const string OutputFolderName = "Output";
+    public const string DefaultPngFileName = "Heatmap.png";
 
     public static string ResolveFrom(string startDirectory)
     {
@@ -34,5 +36,11 @@ public static class ConfigPathResolver
     {
         var baseFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         return Path.Combine(baseFolder, AppFolderName, ConfigFileName);
+    }
+
+    public static string GetDefaultPngOutputPath()
+    {
+        var baseFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        return Path.Combine(baseFolder, AppFolderName, OutputFolderName, DefaultPngFileName);
     }
 }

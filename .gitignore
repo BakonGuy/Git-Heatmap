@@ -6,3 +6,5 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 /heatmap.config.json
+/*.msi
+/Directory.Build.props
