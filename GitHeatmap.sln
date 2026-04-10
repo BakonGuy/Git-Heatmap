@@ -1,6 +1,6 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Git-Heatmap", "Git-Heatmap\Git-Heatmap.csproj", "{3A30C45F-12B4-4D4A-8F0A-D8159F5CAE35}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHeatmap", "GitHeatmap\GitHeatmap.csproj", "{3A30C45F-12B4-4D4A-8F0A-D8159F5CAE35}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHeatmap.Cli", "GitHeatmap.Cli\GitHeatmap.Cli.csproj", "{2279BF36-0F84-44EA-92DB-2BC3A470E4FB}"
 EndProject
@@ -43,3 +43,4 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
+

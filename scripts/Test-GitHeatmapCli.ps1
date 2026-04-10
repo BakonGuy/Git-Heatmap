@@ -1,5 +1,5 @@
 param(
-    [string]$ExePath = "D:\_AppDev\Utilities\Git-Heatmap\Git-Heatmap\bin\Debug\net9.0-windows\Git-Heatmap.exe",
+    [string]$ExePath = "D:\_AppDev\Utilities\Git-Heatmap\GitHeatmap\bin\Debug\net9.0-windows\GitHeatmap.exe",
     [string[]]$CliArgs = @("export", "--png"),
     [int]$TimeoutSeconds = 15
 )
@@ -33,7 +33,7 @@ Set-Content -LiteralPath $argsTextPath -Value @(
 )
 
 $beforeIds = @(
-    Get-Process -Name "Git-Heatmap","GitHeatmap.Cli" -ErrorAction SilentlyContinue |
+    Get-Process -Name "GitHeatmap","GitHeatmap.Cli" -ErrorAction SilentlyContinue |
     Select-Object -ExpandProperty Id
 )
 
@@ -56,7 +56,7 @@ $stderrTask = $proc.StandardError.ReadToEndAsync()
 $finished = $proc.WaitForExit($TimeoutSeconds * 1000)
 $timedOut = -not $finished
 
-$after = Get-Process -Name "Git-Heatmap","GitHeatmap.Cli" -ErrorAction SilentlyContinue
+$after = Get-Process -Name "GitHeatmap","GitHeatmap.Cli" -ErrorAction SilentlyContinue
 $newProcesses = @()
 if ($after) {
     $newProcesses = $after | Where-Object { $beforeIds -notcontains $_.Id }
@@ -88,7 +88,7 @@ if (-not $timedOut) {
     $exitCode = $proc.ExitCode
 }
 
-$processSnapshot = Get-Process -Name "Git-Heatmap","GitHeatmap.Cli" -ErrorAction SilentlyContinue |
+$processSnapshot = Get-Process -Name "GitHeatmap","GitHeatmap.Cli" -ErrorAction SilentlyContinue |
     Select-Object Id, ProcessName, StartTime, CPU, WS, MainWindowTitle
 
 $summary = @(
@@ -111,7 +111,7 @@ if ($newProcesses.Count -eq 0) {
 }
 
 $summary += ""
-$summary += "Current Git-Heatmap* processes after cleanup:"
+$summary += "Current GitHeatmap* processes after cleanup:"
 if (-not $processSnapshot) {
     $summary += "  (none)"
 } else {
@@ -132,3 +132,4 @@ if ($timedOut) {
 }
 
 exit 0
+

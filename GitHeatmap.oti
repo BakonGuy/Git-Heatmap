@@ -1,0 +1,18 @@
+{
+  "ProjectName": "GitHeatmap",
+  "SolutionPath": "GitHeatmap.sln",
+  "ProjectPath": "GitHeatmap\\GitHeatmap.csproj",
+  "PrimaryProjectPath": "GitHeatmap\\GitHeatmap.csproj",
+  "IncludedProjectPaths": [
+    "GitHeatmap\\GitHeatmap.csproj",
+    "GitHeatmap.Cli\\GitHeatmap.Cli.csproj"
+  ],
+  "BuildConfiguration": "Release",
+  "UpgradeCode": "9AAC763C-7D78-4D6C-A262-26295389BDC0",
+  "BuildOutputFolder": "GitHeatmap\\bin\\Release\\net9.0-windows",
+  "MainExecutable": "GitHeatmap\\bin\\Release\\net9.0-windows\\GitHeatmap.exe",
+  "InstallDirectoryName": "GitHeatmap",
+  "AddToPath": false,
+  "RunAtStartup": false
+}
+

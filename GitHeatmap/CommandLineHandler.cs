@@ -179,9 +179,9 @@ internal static class CommandLineHandler
     private static void PrintUsage()
     {
         Console.WriteLine("Usage:");
-        Console.WriteLine("  Git-Heatmap.exe");
-        Console.WriteLine("  Git-Heatmap.exe refresh [--config <path>]");
-        Console.WriteLine("  Git-Heatmap.exe export [--config <path>] [--html <path>] [--png [path]]");
+        Console.WriteLine("  GitHeatmap.exe");
+        Console.WriteLine("  GitHeatmap.exe refresh [--config <path>]");
+        Console.WriteLine("  GitHeatmap.exe export [--config <path>] [--html <path>] [--png [path]]");
     }
 
     private static void TryAttachToParentConsole()
@@ -205,3 +205,4 @@ internal static class CommandLineHandler
         public static ParsedArgs Fail(string message) => new() { Success = false, ErrorMessage = message };
     }
 }
+
